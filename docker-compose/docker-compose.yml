@@ -1,0 +1,76 @@
+version: '3'
+
+services:
+  rabbitmq:
+    image: rabbitmq:management
+    ports:
+      - 15672:15672
+      - 5672:5672
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.8.6
+    ports:
+      - 9200:9200
+      - 9300:9300
+    environment:
+      -  discovery.type=single-node
+    volumes:
+      - $HOME/elasticsearch-data:/usr/share/elasticsearch/data
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:6.8.6
+    ports:
+      - 5601:5601
+
+  case-server:
+    image: powsybl/case-server:latest
+    ports:
+      - 5000:80
+    volumes:
+      - $PWD/case-server-application.yml:/config/application.yml:Z
+      - $HOME/cases:/cases:Z
+
+  network-store-server:
+    image: powsybl/network-store-server:latest
+    ports:
+      - 8080:80
+    volumes:
+      - $PWD/network-store-server-application.yml:/config/application.yml:Z
+      - $PWD/cassandra.properties:/config/cassandra.properties:Z
+
+  geo-data-server:
+    image: powsybl/geo-data-server:latest
+    ports:
+      - 8087:80
+    volumes:
+      - $PWD/geo-data-server-application.yml:/config/application.yml:Z
+      - $PWD/cassandra.properties:/config/cassandra.properties:Z
+
+  network-conversion-server:
+    image: powsybl/network-conversion-server:latest
+    ports:
+      - 5003:80
+    volumes:
+      - $PWD/network-conversion-server-application.yml:/config/application.yml:Z
+
+  network-diff-server:
+    image: network-diff-server:latest
+    ports:
+      - 6007:80
+    volumes:
+      - $PWD/network-diff-server-application.yml:/config/application.yml:Z
+
+  network-diff-study-server:
+    image: network-diff-study-server:latest
+    ports:
+      - 6008:80
+    volumes:
+      - $PWD/network-diff-study-server-application.yml:/config/application.yml:Z
+      - $PWD/cassandra.properties:/config/cassandra.properties:Z
+
+#  network-diff-study-app:
+#    image: network-diff-study-app:latest
+#    ports:
+#      - 4200:80
+
+
