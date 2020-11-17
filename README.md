@@ -57,10 +57,17 @@ To build the Docker images for network-diff-server, open a terminal in the netwo
 mvn clean install jib:dockerBuild -Djib.to.image=network-diff-server
 
 ```
-Note: network-diff-server needs the iidm-diff module, which is currently in branch networks_diff of powsybl-core. 
+Note1: network-diff-server needs the iidm-diff module, which is currently in branch networks_diff of powsybl-core. 
 To be able to compile network-diff-server, switch to that branch, change the module version to 3.6.0 in pom.xml, and 
 ```bash 
 cd powsybl-core/iidm/iidm-diff
+mvn clean install
+```
+
+Note2: network-diff-server wants the network-store-client module, which is part of powsybl-network-store and is not available yet from the maven repository;
+To compile powsybl-network-store, clone the [powsybl-network-store](https://github.com/powsybl/powsybl-network-store) repository and then
+ ```bash 
+cd powsybl-network-store
 mvn clean install
 ```
 
