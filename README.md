@@ -102,6 +102,12 @@ http://localhost:5003/swagger-ui.html  // network conversion server
 http://localhost:6007/swagger-ui.html  // network-diff-server
 http://localhost:6008/swagger-ui.html  // network-diff-study-server
 ```
+Kibana management UI:
+```html
+http://localhost:5601
+```
+In order to show documents in the case-server index with Kibana, you must first create the index pattern ('Management' page) : case-server*
+
 
 ## Network-diff-study-app
 
