@@ -42,13 +42,19 @@ CREATE KEYSPACE IF NOT EXISTS geo_data WITH REPLICATION = { 'class' : 'SimpleStr
 CREATE KEYSPACE IF NOT EXISTS diffstudy WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
 ```
 
-Then copy paste following files content to cqlsh shell:
+Then download the following files:
 ```html
 https://github.com/powsybl/powsybl-network-store/blob/master/network-store-server/src/main/resources/iidm.cql
 https://github.com/powsybl/powsybl-geo-data/blob/master/geo-data-server/src/main/resources/geo_data.cql
-network-diff-study-server/src/main/resources/diffstudy.cql
+https://github.com/itesla/network-diff-study-server/blob/main/src/main/resources/diffstudy.cql
 ```
 
+Finally, type in the cqlsh shell these commands:
+```bash 
+source 'iidm.cql';
+source 'geo_data.cql';
+source 'diffstudy.cql';
+```
 
 ## Docker compose deployment
 
