@@ -58,7 +58,7 @@ mvn clean install jib:dockerBuild -Djib.to.image=network-diff-server
 
 ```
 Note1: network-diff-server needs the iidm-diff module, which is currently in branch networks_diff of powsybl-core. 
-To be able to compile network-diff-server, switch to that branch, change the module version to 3.6.0 in pom.xml, and 
+To be able to compile network-diff-server, switch to that branch, change the module version to 3.7.1 in pom.xml, and 
 ```bash 
 cd powsybl-core/iidm/iidm-diff
 mvn clean install
