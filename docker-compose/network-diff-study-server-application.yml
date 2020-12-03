@@ -23,6 +23,9 @@ backing-services:
     base-uri: http://network-conversion-server/
   network-diff:
     base-uri: http://network-diff-server/
+  geo-server:
+    base-uri: http://geo-data-server/
+
 
 network-store-server:
   preloading-strategy: COLLECTION
