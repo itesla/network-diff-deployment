@@ -23,7 +23,8 @@ services:
       - 5601:5601
 
   case-server:
-    image: powsybl/case-server:latest
+#    image: powsybl/case-server:latest
+    image: powsybl/case-server@sha256:a8e401025635c3107bf7ed9cea369e28caee713799a271a18e4fd78667081a6d
     ports:
       - 5000:80
     volumes:
@@ -31,7 +32,8 @@ services:
       - $HOME/cases:/cases:Z
 
   network-store-server:
-    image: powsybl/network-store-server:latest
+#    image: powsybl/network-store-server:latest
+    image: powsybl/network-store-server@sha256:434d1df27e160e6dbaac27b127bbcc72cf22b4c77bd54f1aa3b88bcc890ff682 
     ports:
       - 8080:80
     volumes:
@@ -39,7 +41,8 @@ services:
       - $PWD/cassandra.properties:/config/cassandra.properties:Z
 
   geo-data-server:
-    image: powsybl/geo-data-server:latest
+#    image: powsybl/geo-data-server:latest
+    image: powsybl/geo-data-server@sha256:01a21e66f72b5153883dd94e3e24a661c9f2649cd62a24a6fd9030b46629ca73
     ports:
       - 8087:80
     volumes:
@@ -47,7 +50,8 @@ services:
       - $PWD/cassandra.properties:/config/cassandra.properties:Z
 
   network-conversion-server:
-    image: powsybl/network-conversion-server:latest
+#    image: powsybl/network-conversion-server:latest
+    image: powsybl/network-conversion-server@sha256:7d2d6011bc7e3edebc5ca9ff8057532b0794ac4c69da8abede0980014d6b3a77 
     ports:
       - 5003:80
     volumes:
