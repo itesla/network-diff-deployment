@@ -28,7 +28,7 @@ backing-services:
 
 
 network-store-server:
-  preloading-strategy: COLLECTION
+  preloading-strategy: NONE
   base-uri: http://network-store-server/ 
 
 
