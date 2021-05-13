@@ -1,19 +1,42 @@
 [![MPL-2.0 License](https://img.shields.io/badge/license-MPL_2.0-blue.svg)](https://www.mozilla.org/en-US/MPL/2.0/)
 
-# Networks Diff-study deployment
+# Networks diff-study
 
-Clone the repositories:
+## Requirements and dependencies: backend services
+Network diff-study depends on the services provided by these modules
 
-* network-diff-deployment  (this repository)
-* network-diff-server
-* network-diff-study-server
-* network-diff-study-app
+* [powsybl-network-store](https://github.com/powsybl/powsybl-network-store.git)  (compile time, runtime)
+* [powsybl-network-conversion-server](https://github.com/powsybl/powsybl-network-conversion-server.git) (runtime)
+* [powsybl-case](https://github.com/powsybl/powsybl-case.git) (runtime)
+* [geo-data](https://github.com/gridsuite/geo-data.git) (compile time, runtime)
 
-## Cassandra install
+Docker takes care of providing the correct docker images versions for the modules runtimes, so there is no need to build everything from te sources.
+However, powsybl-network-store and geo-data modules must be cloned from github and built locally, before compiling the network diff-study related modules.
 
-Download the last version of [Cassandra](http://www.apache.org/dyn/closer.lua/cassandra/3.11.5/apache-cassandra-3.11.5-bin.tar.gz)
+Please note that it is required a specific commit id, for the above modules (since they are not esplicitly versioned on github),
 
-In order to be accessible to the clients, Cassandra has to be bind to one the ip address of the machine.  The following variables have to be modified in conf/cassandra.yaml before starting the Cassandra daemon.
+* powsybl-network-store:  b3531fef173886dd0a1b5a8a45cae2aa6fcb5fdb
+```bash 
+git clone https://github.com/powsybl/powsybl-network-store.git
+cd powsybl-network-store
+git checkout b3531fef173886dd0a1b5a8a45cae2aa6fcb5fdb
+mvn clean install -DskipTests
+```
+* geo-data: 2b4909d227d94250ed3bff9b42cc6f39d7165f40
+```bash 
+git clone https://github.com/gridsuite/geo-data.git
+cd geo-data
+git checkout 2b4909d227d94250ed3bff9b42cc6f39d7165f40
+mvn clean install -DskipTests
+```
+
+## Requirements and dependencies: Cassandra installation and configuration
+
+Download and install the 3.11.5 version of [Cassandra](http://www.apache.org/dyn/closer.lua/cassandra/3.11.5/apache-cassandra-3.11.5-bin.tar.gz)
+
+In order to be accessible to the clients, Cassandra has to be bind to one the ip address of the machine.  
+
+The following variables have to be modified in conf/cassandra.yaml before starting the Cassandra daemon.
 
 ```yaml
 seed_provider:
@@ -42,10 +65,10 @@ CREATE KEYSPACE IF NOT EXISTS geo_data WITH REPLICATION = { 'class' : 'SimpleStr
 CREATE KEYSPACE IF NOT EXISTS diffstudy WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
 ```
 
-Then download the following files:
+Then, download the following files:
 ```html
-https://github.com/powsybl/powsybl-network-store/blob/master/network-store-server/src/main/resources/iidm.cql
-https://github.com/powsybl/powsybl-geo-data/blob/master/geo-data-server/src/main/resources/geo_data.cql
+https://github.com/powsybl/powsybl-network-store/blob/b3531fef173886dd0a1b5a8a45cae2aa6fcb5fdb/network-store-server/src/main/resources/iidm.cql
+https://github.com/gridsuite/geo-data/blob/2b4909d227d94250ed3bff9b42cc6f39d7165f40/geo-data-server/src/main/resources/geo_data.cql
 https://github.com/itesla/network-diff-study-server/blob/main/src/main/resources/diffstudy.cql
 ```
 
@@ -56,33 +79,44 @@ source 'geo_data.cql';
 source 'diffstudy.cql';
 ```
 
-## Docker compose deployment
+## Networks diff-study: compiling
+
+Clone the repositories from GitHub
+
+* [network-diff-deployment](https://github.com/itesla/network-diff-deployment.git)  (this repository: docker-compose files and instructions)
+* [network-diff-iidm](https://github.com/itesla/network-diff-iidm.git)  (java module)
+* [network-diff-server](https://github.com/itesla/network-diff-server.git) (java module)
+* [network-diff-study-server](https://github.com/itesla/network-diff-study-server.git) (java module)
+* [network-diff-study-app](https://github.com/itesla/network-diff-study-app.git)  (angular module)
+
+and build all the java modules, using Maven (order is important: network-diff-iidm before the others).
+```bash 
+cd MODULE-DIR
+mvn clean install
+
+```
+
+## Networks diff-study: create the modules' docker images
 
 To build the Docker images for network-diff-server, open a terminal in the network-diff-server directory and execute
 ```bash 
-mvn clean install jib:dockerBuild -Djib.to.image=network-diff-server
+cd network-diff-server
+mvn clean install jib:dockerBuild -Djib.container.creationTime=USE_CURRENT_TIMESTAMP -Djib.to.image=network-diff-server
 
-```
-Note1: network-diff-server needs the iidm-diff module, which is currently in branch networks_diff of powsybl-core. 
-To be able to compile network-diff-server, switch to that branch, change the module version to 3.7.1 in pom.xml, and 
-```bash 
-cd powsybl-core/iidm/iidm-diff
-mvn clean install
-```
-
-Note2: network-diff-server wants the network-store-client module, which is part of powsybl-network-store and is not available yet from the maven repository;
-To compile powsybl-network-store, clone the [powsybl-network-store](https://github.com/powsybl/powsybl-network-store) repository and then
- ```bash 
-cd powsybl-network-store
-mvn clean install
 ```
 
 To build the Docker images for network-diff-study-server, open a terminal in the network-diff-study-server directory and execute
 ```bash 
-mvn clean install jib:dockerBuild -Djib.to.image=network-diff-study-server
+cd network-diff-study-server
+mvn clean install jib:dockerBuild -Djib.container.creationTime=USE_CURRENT_TIMESTAMP -Djib.to.image=network-diff-study-server
 
 ```
-Edit the cassandra.properties file and make the "cassandra.contact-points" property point to your Cassandra server
+
+## Networks diff-study: docker-compose configuration and deployment
+
+Install, if not already available, the orchestration tool [docker-compose](https://docs.docker.com/compose/install/).
+
+Edit the network-diff-deployment/docker-compose/cassandra.properties file and make the "cassandra.contact-points" property point to your Cassandra server
 
 Note : When using docker-compose for deployment, your host machine is accessible from the containers thought the ip address
 `172.17.0.1`, so to make Cassandra accessible from the deployed containers, '<YOUR_IP>' in the "Cassandra section" above should be set to `172.17.0.1`. 
@@ -91,16 +125,16 @@ but it does not seem to work: "Error message is: "All host(s) tried for query fa
 To setup a demo for the project, Cassandra was installed on a separate server, configured to listen from its ip (ref. related instructions, above), 
 and cassandra.properties edited, accordingly.
 
-Install the orchestration tool docker-compose then execute :
+
+### Execute docker-compose
 
 ```bash 
-cd docker-compose
+cd network-diff-deployment/docker-compose
 docker-compose up
 ```
 
-You can now access to the swagger UI of all the available services:
+When all the available services are up and running (this might take some time), their swagger UIs can be reached at these URLs:
 
-Swagger UI:
 ```html
 http://localhost:8080/swagger-ui.html  // network-store-server
 http://localhost:5000/swagger-ui.html  // case-server
@@ -112,7 +146,7 @@ Kibana management UI:
 ```html
 http://localhost:5601
 ```
-In order to show documents in the case-server index with Kibana, you must first create the index pattern ('Management' page) : case-server*
+Note: in order to show documents in the case-server index with Kibana, you must first create the index pattern ('Management' page) : case-server*
 
 
 ## Network-diff-study-app
@@ -122,19 +156,33 @@ then
 
 ```bash 
 cd network-diff-study-app
-npm update
+npm install
 ng serve
 ```
-In your browser, open http://localhost:4200/ to see the application run.
 
-Currently, the network-diff-study-app allows you 
+After the frontend service has started, the Network-diff-study-app is available at http://localhost:4200
 
-1) to list and delete the studies in the db (Diffstudy: list)
-2) to create a new diff-study, with a name for the case, a description and the two cases that you are going to compare (Diffstudy: create) 
-3) to compare a voltage level between the two network in a study and display the differences (Diffstudy: compare).   
+Currently, the network-diff-study-app allows to:
 
-At the current stage, you cannot upload network data via the application, please use the "import a case in the public directory" service from the case-server service http://localhost:5000/swagger-ui.html swagger UI, instead.
+1) create a new diff-study, from two cases that you are going to compare.
+2) list and delete the diff-studies available in the database.
+3) define a zone for the diff-study as a list of substations.
+4) compare a voltage level between the two network in a study and display the differences.   
+5) compare a substation between the two network in a study and display the differences.
+6) display the differences in a zone (list of substations), on a geo map.
+
+At the current stage, you cannot upload network data directly using the app, please use the "import a case in the public directory" service from the case-server service http://localhost:5000/swagger-ui.html swagger UI, instead.
 
 Once networks are in the case-server, you can search for them in the "Diffstudy: create" form: try typing * in the Case1Uuid/Case2Uuid fields (search service backed by elasticsearch).
 
-Note: web application tested with Google Chrome
+Note: web application tested with Google Chrome, Firefox
+
+
+# Backend services versions details
+
+|   | GitHub commit | Docker image sha256 |
+| ------------- | ------------- | ------------- |
+| powsybl-network-store server |  [b3531fef173886dd0a1b5a8a45cae2aa6fcb5fdb](https://github.com/powsybl/powsybl-network-store/commit/b3531fef173886dd0a1b5a8a45cae2aa6fcb5fdb)  | powsybl/network-store-server@sha256:434d1df27e160e6dbaac27b127bbcc72cf22b4c77bd54f1aa3b88bcc890ff682 |
+| geo-data server |  [e801ac18fbe78c74b4d88fc55b8d055b81d306a9](https://github.com/gridsuite/geo-data/commit/e801ac18fbe78c74b4d88fc55b8d055b81d306a9)  | powsybl/geo-data-server@sha256:01a21e66f72b5153883dd94e3e24a661c9f2649cd62a24a6fd9030b46629ca73 |
+| network-conversion-server  |  [22e91b73641a0045cc26f79924969794e450e8e7](https://github.com/powsybl/powsybl-network-conversion-server/commit/22e91b73641a0045cc26f79924969794e450e8e7)  | powsybl/network-conversion-server@sha256:7d2d6011bc7e3edebc5ca9ff8057532b0794ac4c69da8abede0980014d6b3a77 |
+| case-server  |  [849c162b1dfbefb8fb475d546af9c30a47c09e06](https://github.com/powsybl/powsybl-case/commit/849c162b1dfbefb8fb475d546af9c30a47c09e06)  | powsybl/case-server@sha256:a8e401025635c3107bf7ed9cea369e28caee713799a271a18e4fd78667081a6d |
