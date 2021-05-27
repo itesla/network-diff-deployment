@@ -74,8 +74,11 @@ https://github.com/itesla/network-diff-study-server/blob/main/src/main/resources
 
 Finally, type in the cqlsh shell these commands:
 ```bash 
+use iidm;
 source 'iidm.cql';
+use geo_data;
 source 'geo_data.cql';
+use diffstudy;
 source 'diffstudy.cql';
 ```
 
