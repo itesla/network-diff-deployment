@@ -15,18 +15,18 @@ However, powsybl-network-store and geo-data modules must be cloned from github a
 
 Please note that it is required a specific commit id, for the above modules (since they are not esplicitly versioned on github),
 
-* powsybl-network-store:  b3531fef173886dd0a1b5a8a45cae2aa6fcb5fdb
+* powsybl-network-store:  3356b20b10446209e21748ecc697d26782e331c6
 ```bash 
 git clone https://github.com/powsybl/powsybl-network-store.git
 cd powsybl-network-store
-git checkout b3531fef173886dd0a1b5a8a45cae2aa6fcb5fdb
+git checkout 3356b20b10446209e21748ecc697d26782e331c6
 mvn clean install -DskipTests
 ```
-* geo-data: 2b4909d227d94250ed3bff9b42cc6f39d7165f40
+* geo-data: 4368cf809287e47d191a8070ba4bee798de850b2
 ```bash 
 git clone https://github.com/gridsuite/geo-data.git
 cd geo-data
-git checkout 2b4909d227d94250ed3bff9b42cc6f39d7165f40
+git checkout 4368cf809287e47d191a8070ba4bee798de850b2
 mvn clean install -DskipTests
 ```
 
@@ -67,15 +67,18 @@ CREATE KEYSPACE IF NOT EXISTS diffstudy WITH REPLICATION = { 'class' : 'SimpleSt
 
 Then, download the following files:
 ```html
-https://github.com/powsybl/powsybl-network-store/blob/b3531fef173886dd0a1b5a8a45cae2aa6fcb5fdb/network-store-server/src/main/resources/iidm.cql
-https://github.com/gridsuite/geo-data/blob/2b4909d227d94250ed3bff9b42cc6f39d7165f40/geo-data-server/src/main/resources/geo_data.cql
+https://github.com/powsybl/powsybl-network-store/blob/3356b20b10446209e21748ecc697d26782e331c6/network-store-server/src/main/resources/iidm.cql
+https://github.com/gridsuite/geo-data/blob/4368cf809287e47d191a8070ba4bee798de850b2/geo-data-server/src/main/resources/geo_data.cql
 https://github.com/itesla/network-diff-study-server/blob/main/src/main/resources/diffstudy.cql
 ```
 
 Finally, type in the cqlsh shell these commands:
 ```bash 
+use iidm;
 source 'iidm.cql';
+use geo_data;
 source 'geo_data.cql';
+use diffstudy;
 source 'diffstudy.cql';
 ```
 
@@ -182,7 +185,7 @@ Note: web application tested with Google Chrome, Firefox
 
 |   | GitHub commit | Docker image sha256 |
 | ------------- | ------------- | ------------- |
-| powsybl-network-store server |  [b3531fef173886dd0a1b5a8a45cae2aa6fcb5fdb](https://github.com/powsybl/powsybl-network-store/commit/b3531fef173886dd0a1b5a8a45cae2aa6fcb5fdb)  | powsybl/network-store-server@sha256:434d1df27e160e6dbaac27b127bbcc72cf22b4c77bd54f1aa3b88bcc890ff682 |
-| geo-data server |  [e801ac18fbe78c74b4d88fc55b8d055b81d306a9](https://github.com/gridsuite/geo-data/commit/e801ac18fbe78c74b4d88fc55b8d055b81d306a9)  | powsybl/geo-data-server@sha256:01a21e66f72b5153883dd94e3e24a661c9f2649cd62a24a6fd9030b46629ca73 |
-| network-conversion-server  |  [22e91b73641a0045cc26f79924969794e450e8e7](https://github.com/powsybl/powsybl-network-conversion-server/commit/22e91b73641a0045cc26f79924969794e450e8e7)  | powsybl/network-conversion-server@sha256:7d2d6011bc7e3edebc5ca9ff8057532b0794ac4c69da8abede0980014d6b3a77 |
-| case-server  |  [849c162b1dfbefb8fb475d546af9c30a47c09e06](https://github.com/powsybl/powsybl-case/commit/849c162b1dfbefb8fb475d546af9c30a47c09e06)  | powsybl/case-server@sha256:a8e401025635c3107bf7ed9cea369e28caee713799a271a18e4fd78667081a6d |
+| powsybl-network-store server |  [3356b20b10446209e21748ecc697d26782e331c6](https://github.com/powsybl/powsybl-network-store/commit/3356b20b10446209e21748ecc697d26782e331c6)  | powsybl/network-store-server@sha256:f86d64442d97db7eec233eefb391ddf28ca56c5dc711e308e8e2c5c1e44a1edd |
+| geo-data server |  [4368cf809287e47d191a8070ba4bee798de850b2](https://github.com/gridsuite/geo-data/commit/4368cf809287e47d191a8070ba4bee798de850b2)  | gridsuite/geo-data-server@sha256:ca6a292c3c6a8a1294de7c4bee330db193d5181096231d502d3d82c08faa24ed |
+| network-conversion-server  |  [10b90daeb9b53263e6fcfc47df66e06c4411b8dc](https://github.com/powsybl/powsybl-network-conversion-server/commit/10b90daeb9b53263e6fcfc47df66e06c4411b8dc)  | powsybl/network-conversion-server@sha256:98850dd4e5be997b7128302e86092d59c08e2af4bb75164c5ccb5b93128d8923 |
+| case-server  |  [4a6f0a6520eb7bedbc02f1ffb72ec4bbbe68281c](https://github.com/powsybl/powsybl-case/commit/4a6f0a6520eb7bedbc02f1ffb72ec4bbbe68281c)  | powsybl/case-server@sha256:764628636ff5d846e7e69dd747a23fad1c1d9a3d51506530669dc7379631c150 |
