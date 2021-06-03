@@ -152,7 +152,7 @@ http://localhost:5601
 Note: in order to show documents in the case-server index with Kibana, you must first create the index pattern ('Management' page) : case-server*
 
 
-## Network-diff-study-app
+## Network-diff-study-app (dev environment)
 
 Network-diff-study-app is an Angular based web application; to execute it, you need first to install Angular CLI (https://angular.io/cli),
 then
@@ -160,7 +160,7 @@ then
 ```bash 
 cd network-diff-study-app
 npm install
-ng serve
+npm start
 ```
 
 After the frontend service has started, the Network-diff-study-app is available at http://localhost:4200
