@@ -9,6 +9,7 @@ Network diff-study depends on the services provided by these modules
 * [powsybl-network-conversion-server](https://github.com/powsybl/powsybl-network-conversion-server.git) (runtime)
 * [powsybl-case](https://github.com/powsybl/powsybl-case.git) (runtime)
 * [geo-data](https://github.com/gridsuite/geo-data.git) (compile time, runtime)
+* [report-server](https://github.com/gridsuite/report-server.git) (runtime)
 
 Docker takes care of providing the correct docker images versions for the modules runtimes, so there is no need to build everything from te sources.
 However, powsybl-network-store and geo-data modules must be cloned from github and built locally, before compiling the network diff-study related modules.
@@ -32,7 +33,7 @@ mvn clean install -DskipTests
 
 ## Requirements and dependencies: Cassandra installation and configuration
 
-Download and install the 3.11.5 version of [Cassandra](http://www.apache.org/dyn/closer.lua/cassandra/3.11.5/apache-cassandra-3.11.5-bin.tar.gz)
+Download and install the 3.11.10 version of [Cassandra](https://www.apache.org/dyn/closer.lua/cassandra/3.11.10/apache-cassandra-3.11.10-bin.tar.gz)
 
 In order to be accessible to the clients, Cassandra has to be bind to one the ip address of the machine.  
 
@@ -67,8 +68,8 @@ CREATE KEYSPACE IF NOT EXISTS diffstudy WITH REPLICATION = { 'class' : 'SimpleSt
 
 Then, download the following files:
 ```html
-https://github.com/powsybl/powsybl-network-store/blob/3356b20b10446209e21748ecc697d26782e331c6/network-store-server/src/main/resources/iidm.cql
-https://github.com/gridsuite/geo-data/blob/4368cf809287e47d191a8070ba4bee798de850b2/geo-data-server/src/main/resources/geo_data.cql
+https://github.com/powsybl/powsybl-network-store/blob/1e5ea17264483053e5ef31b8f53c048fe67f2a43/network-store-server/src/main/resources/iidm.cql
+https://github.com/gridsuite/geo-data/blob/ab460f3553111df9f5738853ba39c3dda39af6c4/geo-data-server/src/main/resources/geo_data.cql
 https://github.com/itesla/network-diff-study-server/blob/main/src/main/resources/diffstudy.cql
 ```
 
@@ -81,6 +82,18 @@ source 'geo_data.cql';
 use diffstudy;
 source 'diffstudy.cql';
 ```
+
+## Requirements and dependencies: Postgres
+Postgres is currently required by the report server. To install Postgres, use your system package manager or a dedicated docker container.
+
+### Postgres schema setup
+
+$ bin/psql postgres
+$ create database report;
+
+Then initialize the schemas for the databases:
+
+$ \c report; then copy/paste [report.sql](https://github.com/gridsuite/report-server/blob/c3ec699bb1ccdebd4952a8a9f8b3f7c77ed9ac50/src/main/resources/report.sql) content to psql
 
 ## Networks diff-study: compiling
 
@@ -128,6 +141,7 @@ but it does not seem to work: "Error message is: "All host(s) tried for query fa
 To setup a demo for the project, Cassandra was installed on a separate server, configured to listen from its ip (ref. related instructions, above), 
 and cassandra.properties edited, accordingly.
 
+Set the "POSTGRESSERVER_IP", "POSTGRES_USER" and "POSTGRES_PWD" properties in network-diff-deployment/docker-compose/database.properties file, appropriately.
 
 ### Execute docker-compose
 
@@ -185,7 +199,8 @@ Note: web application tested with Google Chrome, Firefox
 
 |   | GitHub commit | Docker image sha256 |
 | ------------- | ------------- | ------------- |
-| powsybl-network-store server |  [3356b20b10446209e21748ecc697d26782e331c6](https://github.com/powsybl/powsybl-network-store/commit/3356b20b10446209e21748ecc697d26782e331c6)  | powsybl/network-store-server@sha256:f86d64442d97db7eec233eefb391ddf28ca56c5dc711e308e8e2c5c1e44a1edd |
-| geo-data server |  [4368cf809287e47d191a8070ba4bee798de850b2](https://github.com/gridsuite/geo-data/commit/4368cf809287e47d191a8070ba4bee798de850b2)  | gridsuite/geo-data-server@sha256:ca6a292c3c6a8a1294de7c4bee330db193d5181096231d502d3d82c08faa24ed |
-| network-conversion-server  |  [10b90daeb9b53263e6fcfc47df66e06c4411b8dc](https://github.com/powsybl/powsybl-network-conversion-server/commit/10b90daeb9b53263e6fcfc47df66e06c4411b8dc)  | powsybl/network-conversion-server@sha256:98850dd4e5be997b7128302e86092d59c08e2af4bb75164c5ccb5b93128d8923 |
-| case-server  |  [4a6f0a6520eb7bedbc02f1ffb72ec4bbbe68281c](https://github.com/powsybl/powsybl-case/commit/4a6f0a6520eb7bedbc02f1ffb72ec4bbbe68281c)  | powsybl/case-server@sha256:764628636ff5d846e7e69dd747a23fad1c1d9a3d51506530669dc7379631c150 |
+| network-store server |  [1e5ea17264483053e5ef31b8f53c048fe67f2a43](https://github.com/powsybl/powsybl-network-store/commit/1e5ea17264483053e5ef31b8f53c048fe67f2a43)  | powsybl/network-store-server@sha256:a8991bbdfb6e1a0b23de9541b0a3d3852dee7be4f36e6c298b6175f4f292f54a |
+| geo-data server |  [ab460f3553111df9f5738853ba39c3dda39af6c4](https://github.com/gridsuite/geo-data/commit/ab460f3553111df9f5738853ba39c3dda39af6c4)  | gridsuite/geo-data-server@sha256:53e7a6d1ef69dc4919305b9e185891040a9cbeef67d6a3149d36c4a3057132dd |
+| network-conversion-server  |  [309262767f06ae7944d6dc11c47f943343cd9d23](https://github.com/powsybl/powsybl-network-conversion-server/commit/309262767f06ae7944d6dc11c47f943343cd9d23)  | powsybl/network-conversion-server@sha256:d9bddf6de10782075c660eda5b6d3599cff75621f8d47d848fe7863f16204037 |
+| case-server  |  [1c0e6a0f0af86b434f74388a32c6cfe9f3d9ec6a](https://github.com/powsybl/powsybl-case/commit/1c0e6a0f0af86b434f74388a32c6cfe9f3d9ec6a)  | powsybl/case-server@sha256:0f938727ffabb38a956474717ec8948967a03f7088989e98986a554e9b7a3e79 |
+| report-server  |  [c3ec699bb1ccdebd4952a8a9f8b3f7c77ed9ac50](https://github.com/gridsuite/report-server/commit/c3ec699bb1ccdebd4952a8a9f8b3f7c77ed9ac50)  | gridsuite/report-server@sha256:8ba8856ab749ed264916b2aea88c8e97035b941061b95fc836b42419d4c722fe |

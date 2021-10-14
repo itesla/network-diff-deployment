@@ -8,7 +8,7 @@ services:
       - 5672:5672
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.8.6
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.3
     ports:
       - 9200:9200
       - 9300:9300
@@ -18,44 +18,64 @@ services:
       - elasticsearch-data:/usr/share/elasticsearch/data:Z
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:6.8.6
+    image: docker.elastic.co/kibana/kibana:7.9.3
     ports:
       - 5601:5601
 
+  report-server:
+    user: root
+#    image: gridsuite/report-server:latest
+    image: gridsuite/report-server@sha256:8ba8856ab749ed264916b2aea88c8e97035b941061b95fc836b42419d4c722fe
+    ports:
+      - 5028:80
+    volumes:
+      - $PWD/report-server-application.yml:/config/application.yml:Z
+      - $PWD/database.properties:/config/database.properties:Z
+    command: --server.port=80 --spring.config.additional-location=/config/
+
   case-server:
+    user: root
 #    image: powsybl/case-server:latest
-    image: powsybl/case-server@sha256:764628636ff5d846e7e69dd747a23fad1c1d9a3d51506530669dc7379631c150
+    image: powsybl/case-server@sha256:0f938727ffabb38a956474717ec8948967a03f7088989e98986a554e9b7a3e79
     ports:
       - 5000:80
     volumes:
       - $PWD/case-server-application.yml:/config/application.yml:Z
       - case-data:/cases:Z
+    command: --server-port=80 --spring.config.additional-location=/config/
 
   network-store-server:
+    user: root
 #    image: powsybl/network-store-server:latest
-    image: powsybl/network-store-server@sha256:f86d64442d97db7eec233eefb391ddf28ca56c5dc711e308e8e2c5c1e44a1edd
+    image: powsybl/network-store-server@sha256:a8991bbdfb6e1a0b23de9541b0a3d3852dee7be4f36e6c298b6175f4f292f54a
     ports:
       - 8080:80
     volumes:
       - $PWD/network-store-server-application.yml:/config/application.yml:Z
       - $PWD/cassandra.properties:/config/cassandra.properties:Z
+    command: --server-port=80 --spring.config.additional-location=/config/
 
   geo-data-server:
+    user: root
 #    image: gridsuite/geo-data-server:latest
-    image: gridsuite/geo-data-server@sha256:ca6a292c3c6a8a1294de7c4bee330db193d5181096231d502d3d82c08faa24ed
+    image: gridsuite/geo-data-server@sha256:53e7a6d1ef69dc4919305b9e185891040a9cbeef67d6a3149d36c4a3057132dd
     ports:
       - 8087:80
     volumes:
       - $PWD/geo-data-server-application.yml:/config/application.yml:Z
       - $PWD/cassandra.properties:/config/cassandra.properties:Z
+#   sets timeouts-related system parameters because of 'Query timed out after PT2S' error; possibly introduced by newer spring-cassandra data connector
+    command: --server-port=80 --spring.config.additional-location=/config/ -Ddatastax-java-driver.basic.request.timeout="60 seconds" -Ddatastax-java-driver.advanced.connection.init-query-timeout="60 seconds"
 
   network-conversion-server:
-#    image: powsybl/network-conversion-server:latest
-    image: powsybl/network-conversion-server@sha256:98850dd4e5be997b7128302e86092d59c08e2af4bb75164c5ccb5b93128d8923
+    user: root
+    image: powsybl/network-conversion-server:latest
+#    image: powsybl/network-conversion-server@sha256:d9bddf6de10782075c660eda5b6d3599cff75621f8d47d848fe7863f16204037    
     ports:
       - 5003:80
     volumes:
       - $PWD/network-conversion-server-application.yml:/config/application.yml:Z
+    command: --server-port=80 --spring.config.additional-location=/config/
 
   network-diff-server:
     image: network-diff-server:latest
